@@ -1,0 +1,187 @@
+<html>
+<head>
+<style type="text/css">
+body {
+	background-color: transparent;
+	font-family: sans-serif;
+	color: #444;
+	font-size: 9pt;
+	overflow: hidden;
+}
+ul { 
+	-webkit-border-radius: 15px;
+	border: 1px solid #8a9fc5; 
+	background-image: url(bg6.png); 
+	padding: 0;
+	width: 695px;
+	height: 40px;
+	-webkit-box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.1);
+	margin-top: 0px;
+}
+ul li {
+	list-style-type: none;
+	text-align: center;
+	margin: 0;
+	display: block;
+	float: left;
+	height: 40px;
+	margin-top: 5px;
+}
+
+ul li:hover { 
+}
+ul li:first-child {
+	margin-left: 15px;
+}
+ul li:last-child {
+	margin-right: 15px;
+}
+ul li p {
+	margin-top: 0;
+	padding-bottom: 10px;
+}
+#titlebar-wrap {
+	height: 27px;
+	width: 280px;
+	margin: 0 auto;
+}
+#titlebar-wrap > div {
+	height: 27px;
+	position: absolute;
+}
+#titlebar-left {
+	top: 0;
+	width: 15px;
+	left: 220px;
+	background-image: url(titlebar_left.png);
+}
+#titlebar {
+	top: 0;
+	left: 235px;
+	width: 247px;
+	background-image: url(titlebar_bg.png);
+}
+#titletext {
+	height: 15px;
+	width: 100%;
+	margin: 4px;
+	padding: 0;
+	margin-top: 7px;
+	overflow: hidden;
+}
+#titlebar-right {
+	top: 0;
+	left: 482px;
+	width: 15px;
+	background-image: url(titlebar_right.png);
+}
+#address {
+	width: 500px;
+	height: 27px;
+	background-color: white;
+	border: 1px solid #c5cde2; 
+	padding-top: 6px;
+	padding-bottom: 0;
+	text-align: left;
+	padding-left: 4px;
+	color: #2a4d89;
+	overflow: hidden;
+	margin-top: 1px;
+}
+#back {
+	background-image: url(back.png);
+	width: 29px;
+	height: 29px;
+}
+#back:hover {
+	background-image: url(back_h.png);
+}
+#back:active {
+	background-image: url(back_p.png);
+}
+#forward {
+	background-image: url(forward.png);
+	width: 28px;
+	height: 29px;
+}
+#forward:hover {
+	background-image: url(forward_h.png);
+}
+#forward:active {
+	background-image: url(forward_p.png);
+}
+#go {
+	background-image: url(go.png);
+	width: 29px;
+	height: 29px;
+	margin-left: -1px;
+}
+#go:hover {
+	background-image: url(go_h.png);
+}
+#go:active {
+	background-image: url(go_p.png);
+}
+#toggleFullscreen {
+	background-image: url(fullscreen.png);
+	width: 30px;
+	height: 29px;
+	margin-left: 10px;
+}
+#toggleFullscreen:hover {
+	background-image: url(fullscreen_h.png);
+}
+#toggleFullscreen:active {
+	background-image: url(fullscreen_p.png);
+}	
+#destroy {
+	background-image: url(destroy.png);
+	width: 31px;
+	height: 29px;
+	margin-left: 8px;
+}
+#destroy:hover {
+	background-image: url(destroy_h.png);
+}
+#destroy:active {
+	background-image: url(destroy_p.png);
+}	
+</style>
+<script type="text/javascript">
+function updateURL(url)
+{
+
+	document.getElementById('address').value = url;
+}
+
+function navigateTo()
+{
+	url = document.getElementById('address').value;
+	
+	if(url.length == 0)
+		return;
+		
+	if(url.substr(0, 7) != 'http://')
+		url = 'http://' + url;
+		
+	Client.navigateTo(url);
+}
+
+</script>
+</head>
+<body>
+<div id="navigation">
+	<ul>
+		<li id="back" onclick="Client.goBack()" title="Go Back"></li>
+		<li id="forward" onclick="Client.goForward()" title="Go Forward"></li>
+		<li id="toggleFullscreen" onclick="Client.toggleFullscreen()" title="Toggle Fullscreen"></li>		<li id="addressbar">
+			<form onsubmit="navigateTo(); return false;">
+				<input id="address" type="text" class="input" value="" placeholder="Enter an address..." />
+			</form>
+		</li>
+		<li id="go" onclick="navigateTo();" title="Go!"></li>
+		<li id="destroy" onclick="Client.destroy();" title="Close"></li>
+	</ul>
+</div>
+</body>
+</html>

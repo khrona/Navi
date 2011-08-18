@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Navi", "Navi\Navi.vcproj", "{5454DEA8-CB72-43AA-86EB-8A84F677A131}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NaviDemo", "NaviDemo\NaviDemo.vcproj", "{73CFEDCC-5BC5-4CD8-B5E2-9346B7A1517A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5454DEA8-CB72-43AA-86EB-8A84F677A131} = {5454DEA8-CB72-43AA-86EB-8A84F677A131}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5454DEA8-CB72-43AA-86EB-8A84F677A131}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5454DEA8-CB72-43AA-86EB-8A84F677A131}.Debug|Win32.Build.0 = Debug|Win32
+		{5454DEA8-CB72-43AA-86EB-8A84F677A131}.Release|Win32.ActiveCfg = Release|Win32
+		{5454DEA8-CB72-43AA-86EB-8A84F677A131}.Release|Win32.Build.0 = Release|Win32
+		{73CFEDCC-5BC5-4CD8-B5E2-9346B7A1517A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{73CFEDCC-5BC5-4CD8-B5E2-9346B7A1517A}.Debug|Win32.Build.0 = Debug|Win32
+		{73CFEDCC-5BC5-4CD8-B5E2-9346B7A1517A}.Release|Win32.ActiveCfg = Release|Win32
+		{73CFEDCC-5BC5-4CD8-B5E2-9346B7A1517A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

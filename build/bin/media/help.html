@@ -1,0 +1,89 @@
+<html>
+<head>
+<style type="text/css">
+body {
+	background-color: transparent;
+	font-family: sans-serif;
+	color: #506fa5;
+	font-size: 10pt;
+	overflow: hidden;
+	text-shadow: 1px 1px 1px white;
+}
+#header {
+	background: -webkit-gradient(linear, left top, left bottom, from(#fafcfe), to(#d4e4f6), color-stop(0.5, #e2f0fd));
+	width: 98%;
+	height: 55px;
+	-webkit-border-radius:6px;
+	margin: 0 auto;
+}
+#logo {
+	width: 48px;
+	float: left;
+	margin: 5px;
+}
+h2 {
+	float: left;
+	padding: 15px;
+	margin-top: 0;
+	text-shadow: 2px 2px 2px white;
+}
+.spacer {
+	clear: both;
+	height: 10px;
+}
+#content-wrap {
+	height: 350px;
+	width: 430px;
+	float: right;
+	margin-right: 10px;
+	overflow: auto;
+}
+dl {
+	width: 95%;
+}
+dt	{
+	font-weight: bold;
+	margin-top: 5px;
+}
+#content {
+	-webkit-border-radius: 15px;
+	border: 1px solid #8a9fc5; 
+	background: -webkit-gradient(linear, left top, left bottom, from(#fafcfe), to(#dbe7f7), color-stop(0.5, #e8f3fd));
+	padding: 0;
+	-webkit-box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+	width: 100%;
+}
+</style>
+</head>
+<body>
+<div id="content">
+<div id="header" onmousedown="Client.drag()">
+<div id="logo"><img src="help_icon.png"/></div><h2>Help</h2></div>
+<div id="content-wrap">
+<dl>
+	<dt>Basic Directions:</dt>
+	<dd>Begin by creating a 'Gate' using the 'Create' button. Interact with it using the mouse/keyboard and the navigation bar at the top of the screen.</dd>
+	<dt>Moving Around: </dt>
+	<dd>Move around the terrain with the WASD/Arrow keys (while the keyboard isn't focused on a textbox).</dd>
+	<dt>Looking Around: </dt>
+	<dd>Hold down the right-mouse-button and drag to move the camera around</dd>
+	<dt>Creating Multiple Gates:</dt>
+	<dd>To create a Gate, point the camera at an empty spot of the terrain and hit the 'Create' button. You can create as many as you like!</dd>
+	<dt>Moving a Gate: </dt>
+	<dd>Hold down shift while dragging a Gate with the left-mouse-button to move it around the terrain</dd>
+	<dt>Rotating a Gate: </dt>
+	<dd>Hold down shift while dragging a Gate with the right-mouse-button to pivot it in place</dd>
+	<dt>Resizing a Gate: </dt>
+	<dd>Hold down shift and drag the yellow handle in the upper-right corner of a Gate to resize it</dd>
+	<dt>Closing a Gate: </dt>
+	<dd>Select the Gate if it isn't selected and hit the 'Close' button on the navigation bar</dd>
+	<dt>Entering Fullscreen mode: </dt>
+	<dd>Select the Gate if it isn't selected and hit the fullscreen button (left of address bar) to enter fullscreen mode. Click off the page to exit the mode.</dd>
+	<dt>Exiting the Demo: </dt>
+	<dd>Click the 'Exit' button on the menu or hit the 'Escape' key to exit the demo.</dd>
+</dl>
+</div>
+<div class="spacer"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<html>
+<head>
+<script type="text/javascript">
+function setTooltip(text)
+{
+	var tipEle = document.getElementById('tip');
+	tipEle.innerText = text;
+	
+	var width = document.defaultView.getComputedStyle(tipEle, '').getPropertyValue('width');
+	var height = document.defaultView.getComputedStyle(tipEle, '').getPropertyValue('height');
+	
+	width = width.substr(0, width.indexOf("px"));
+	height = height.substr(0, height.indexOf("px"));
+	
+	if(!isNaN(width) && !isNaN(height))
+		Client.resizeTooltip(Number(width) + 10 + 4, Number(height) + 10 + 4);
+	// I'm adding 10 to the width/height because of the padding (5 * 2)-- apparently computed styles don't
+	// take into account padded dimensions.
+}
+</script>
+<style type="text/css">
+#tip {
+	font-family: sans-serif;
+	font-size: 9pt;
+	color: rgb(180, 220, 245);
+	/* background-color: rgba(10, 50, 130, 0.3); */
+	/* background-image: url(bg5.png); */
+	background: -webkit-gradient(linear, left top, left bottom, from(#fafcfe), to(#e5edf7), color-stop(0.5, #f1f7fd));
+	color: #6880a9;
+	text-shadow: 1px 1px 1px white;
+	padding: 5px;
+	margin: 0;
+	display: inline-block;
+	max-width: 175px;
+	text-align: center;
+	-webkit-border-radius: 7px;
+	border: 1px solid #8a9fc5; 
+	-webkit-box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.06);
+}
+
+body {
+	margin: 0;
+	background-color: transparent;
+	overflow: hidden;
+}
+</style>
+</head>
+<body>
+<div style="width: 300px; height: 500px;">
+<span id="tip">
+Hello world
+</span>
+</div>
+</body>
+</html>

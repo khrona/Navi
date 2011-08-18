@@ -1,0 +1,77 @@
+<html>
+<head>
+<style type="text/css">
+body {
+	background-color: transparent;
+	font-family: sans-serif;
+	color: #506fa5;
+	text-shadow: 1px 1px 1px white;
+	font-size: 11pt;
+	overflow: hidden;
+}
+#content {
+	-webkit-border-radius: 15px;
+	border: 1px solid #8a9fc5; 
+	background: -webkit-gradient(linear, left top, left bottom, from(#fafcfe), to(#dbe7f7), color-stop(0.5, #e8f3fd));
+	padding: 0;
+	-webkit-box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+	width: 100%;
+}
+#logo {
+	width: 48px;
+	float: left;
+	margin: 5px;
+}
+h2 {
+	float: left;
+	padding: 15px;
+	margin-top: 0;
+	text-shadow: 2px 2px 2px white;
+}
+div#links1 {
+	float: right;
+	width: 200px;
+	margin-left: 20px;
+}
+div#links1 div, div#links2 div {
+	margin-bottom: 5px;
+}
+div#links2 {
+	float: right;
+	width: 200px;
+}
+#header {
+	background: -webkit-gradient(linear, left top, left bottom, from(#fafcfe), to(#d4e4f6), color-stop(0.5, #e2f0fd));
+	width: 98%;
+	height: 55px;
+	-webkit-border-radius:6px;
+	margin: 0 auto;
+}
+.spacer {
+	clear: both;
+	height: 10px;
+}
+</style>
+</head>
+<body>
+<div id="content">
+<div id="header" onmousedown="Client.drag()">
+<div id="logo"><img src="examples_icon.png"/></div><h2>Examples</h2>
+</div>
+<div class="spacer"></div>
+<div id="links1">
+<div onclick="Client.create('http://ogre3d.org')"><img src="thirdparty_logos/ogre3d_logo.png"/></div>
+<div onclick="Client.create('http://nimblebit.com')"><img src="thirdparty_logos/nimblebit_logo.png"/></div>
+<div onclick="Client.create('http://prezi.com')"><img src="thirdparty_logos/prezi_logo.png"/></div>
+<div onclick="Client.create('http://twitter.com')"><img src="thirdparty_logos/twitter_logo.png"/></div>
+</div>
+<div id="links2">
+<div onclick="Client.create('http://vimeo.com')"><img src="thirdparty_logos/vimeo_logo.png"/></div>
+<div onclick="Client.create('http://youtube.com')"><img src="thirdparty_logos/youtube_logo.png"/></div>
+<div onclick="Client.create('http://www.pixeljam.com/dinorun/')"><img src="thirdparty_logos/dinorun_logo.png"/></div>
+<div onclick="Client.create('http://princeofcode.com')"><img src="thirdparty_logos/princeofcode_logo.png"/></div>
+</div>
+<div class="spacer" style="height: 20px;"></div>
+</div>
+</body>
+</html>

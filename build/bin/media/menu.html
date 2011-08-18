@@ -1,0 +1,111 @@
+<html>
+<head>
+<style type="text/css">
+body {
+	background-color: transparent;
+	font-family: sans-serif;
+	color: #7e93b8;
+	font-size: 8pt;
+	overflow: hidden;
+	text-shadow: 1px 1px 1px white;
+}
+ul { 
+	-webkit-border-radius: 15px;
+	border: 1px solid #8a9fc5; 
+	background-image: url(bg8.png); 
+	width: 80px;
+	padding: 0;
+	-webkit-box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.1);
+}
+ul li {
+	list-style-type: none;
+	text-align: center;
+	margin: 0;
+}
+ul li:first-child
+{
+	margin-top: 15px;
+}
+ul li:hover { 
+}
+ul li p {
+	margin-top: 0;
+	padding-bottom: 10px;
+}
+ul li div {
+	width: 48px;
+	height: 48px;
+	margin: 0 auto;
+}
+div#create_icon
+{
+	background-image: url(create_icon.png);
+}
+div#create_icon:hover
+{
+	background-image: url(create_icon_h.png);
+}
+div#create_icon:active
+{
+	background-image: url(create_icon_p.png);
+}
+div#examples_icon
+{
+	background-image: url(examples_icon.png);
+}
+div#examples_icon:hover
+{
+	background-image: url(examples_icon_h.png);
+}
+div#examples_icon:active
+{
+	background-image: url(examples_icon_p.png);
+}
+div#config_icon
+{
+	background-image: url(config_icon.png);
+}
+div#config_icon:hover
+{
+	background-image: url(config_icon_h.png);
+}
+div#config_icon:active
+{
+	background-image: url(config_icon_p.png);
+}
+div#exit_icon
+{
+	background-image: url(exit_icon.png);
+}
+div#exit_icon:hover
+{
+	background-image: url(exit_icon_h.png);
+}
+div#exit_icon:active
+{
+	background-image: url(exit_icon_p.png);
+}
+div#help_icon
+{
+	background-image: url(help_icon.png);
+}
+div#help_icon:hover
+{
+	background-image: url(help_icon_h.png);
+}
+div#help_icon:active
+{
+	background-image: url(help_icon_p.png);
+}
+</style>
+</head>
+<body>
+<ul>
+	<li onclick="Client.create()"><div id="create_icon" title="Create a new Gate"></div><p>Create</p></li>
+	<li onclick="Client.examples()"><div id="examples_icon" title="Toggle 'Examples' dialog"></div><p>Examples</p></li>
+	<!-- <li onclick="Client.config()"><div id="config_icon" title="Toggle 'Config' dialog"></div><p>Config</p></li> -->
+	<li onclick="Client.help()"><div id="help_icon" title="Toggle 'Help' dialog"></div><p>Help</p></li>
+	<li onclick="Client.exit()"><div id="exit_icon" title="Exit the Demo"></div><p>Exit</p></li>
+</ul>
+</body>
+</html>

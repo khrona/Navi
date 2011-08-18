@@ -1,0 +1,214 @@
+material FullscreenShade
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			lighting off
+			depth_write off
+			depth_check off
+			
+			texture_unit
+			{
+				colour_op_ex source1 src_manual src_current 0 0 0
+				alpha_op_ex source1 src_manual src_current 0.7
+			}
+		} 
+	}
+}
+ 
+material selected
+{
+	receive_shadows off
+	
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			lighting off
+			fog_override true none
+
+			texture_unit
+			{
+				texture selected.png
+			}
+		} 
+	}
+}
+
+material selectedShift
+{
+	receive_shadows off
+	
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			lighting off
+			fog_override true none
+			cull_hardware none
+			cull_software none
+
+			texture_unit
+			{
+				texture selected_r.png
+			}
+		} 
+	}
+}
+
+material resizePickingPlaneMat
+{
+	technique 
+	{
+		pass
+		{
+			color_write off
+			depth_write off
+		}
+	}
+}
+ 
+material Clouds
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			lighting off
+			fog_override true none
+			cull_hardware none
+			cull_software none
+			texture_unit
+			{
+				texture clouds.png
+				scroll_anim 0.013 0.002
+			}
+		} 
+	}
+}
+ 
+material CloudsA
+{
+		technique
+		{
+			pass
+			{
+				scene_blend alpha_blend
+				lighting off
+				fog_override true none
+				texture_unit
+				{
+					texture clouds4.png
+					scroll_anim 0.013 0
+				}
+			}
+			pass
+			{
+				scene_blend alpha_blend
+				lighting off
+				fog_override true none
+				texture_unit
+				{
+					texture clouds2.png
+					scroll_anim 0.007 0.004
+				}
+			}
+		} 
+	}
+}
+ 
+material SkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+			fog_override true none
+			cull_hardware none
+			cull_software none
+
+			texture_unit
+			{
+				cubic_texture sky.png separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+vertex_program test3_vs cg
+{
+   source test3.cg
+   entry_point main_vs
+   profiles vs_1_1 arbvp1
+}
+
+fragment_program test3_ps cg
+{
+   source test3.cg
+   entry_point main_ps
+   profiles ps_2_0 arbfp1
+}
+
+material SkyColor
+ {
+   technique
+   {
+     pass
+     {
+	 
+	         vertex_program_ref test3_vs
+         {
+            param_named_auto worldViewProjMatrix worldviewproj_matrix
+         }
+         
+         fragment_program_ref test3_ps
+         {   
+            param_named_auto eyePosition camera_position_object_space
+         }
+	 lighting off
+		fog_override true none
+       texture_unit
+       {
+
+		 texture nimblebit_logo.png
+       }
+     } 
+   }
+ }
+ 
+material webMaterial
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture	shortGrass.jpg
+				scale 0.0325 0.0325
+				filtering trilinear
+				colour_op replace
+			}
+			texture_unit
+			{
+				texture	terrain.png
+			}
+			texture_unit
+		   {
+
+			 texture cloud_shadows.jpg
+			 scroll_anim 0.007 0.004
+
+		   }
+
+		}
+	}
+}
