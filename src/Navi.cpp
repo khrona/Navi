@@ -122,7 +122,7 @@ Navi::~Navi()
 		delete[] alphaCache;
 
 	if(webView)
-		webView->destroy();
+		awe_webview_destroy(webView);
 
 	if(overlay)
 		delete overlay;
@@ -134,9 +134,10 @@ Navi::~Navi()
 
 void Navi::createWebView(bool asyncRender, int maxAsyncRenderRate)
 {
-	webView = Awesomium::WebCore::Get().createWebView(naviWidth, naviHeight);
-	webView->setListener(this);
-	webView->createObject(L"Client");
+	webView = awe_webcore_create_webview(naviWidth, naviHeight, false);
+	OSM::WebViewEventHelper::instance().addListener(webView, this);
+	
+	awe_webview_create_object(webView, OSM_STR("Client"));
 
 	bind("drag", NaviDelegate(this, &Navi::onRequestDrag));
 }
@@ -232,7 +233,7 @@ void Navi::update()
 		baseTexUnit->setAlphaOperation(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, static_cast<Ogre::Real>(fadeValue * opacity));
 
 	if(!needsForceRender)
-		if(!webView->isDirty())
+		if(!awe_webview_is_dirty(webView))
 			return;
 
 	TexturePtr texture = TextureManager::getSingleton().getByName(naviName + "Texture");
@@ -243,9 +244,9 @@ void Navi::update()
 
 	uint8* destBuffer = static_cast<uint8*>(pixelBox.data);
 
-	const Awesomium::RenderBuffer* renderBuffer = webView->render();
+	const awe_renderbuffer* renderBuffer = awe_webview_render(webView);
 
-	renderBuffer->copyTo(destBuffer, texPitch, texDepth, false, false);
+	awe_renderbuffer_copy_to(renderBuffer, destBuffer, texPitch, texDepth, false, false);
 
 	if(isWebViewTransparent && !usingMask && ignoringTrans)
 	{
@@ -326,7 +327,8 @@ void Navi::resizeIfNeeded()
 		overlay->resize(naviWidth, naviHeight);
 		overlay->panel->setUV(0, 0, (Real)naviWidth/newTexWidth, (Real)naviHeight/newTexHeight);	
 	}
-	webView->resize(naviWidth, naviHeight);
+
+	awe_webview_resize(webView, naviWidth, naviHeight, false, 0);
 
 	if(newTexWidth == texWidth && newTexHeight == texHeight)
 		return;
@@ -396,29 +398,30 @@ bool Navi::isPointOverMe(int x, int y)
 void Navi::loadURL(const std::string& url)
 {
 	if(webView)
-		webView->loadURL(url);
+		awe_webview_load_url(webView, OSM_STR(url), OSM_EMPTY(),
+		OSM_EMPTY(), OSM_EMPTY());
 }
 
 void Navi::loadFile(const std::string& file)
 {
 	if(webView)
-		webView->loadFile(file);
+		awe_webview_load_file(webView, OSM_STR(file), OSM_EMPTY());
 }
 
 void Navi::loadHTML(const std::string& html)
 {
 	if(webView)
-		webView->loadHTML(html);
+		awe_webview_load_html(webView, OSM_STR(html), OSM_EMPTY());
 }
 
-void Navi::evaluateJS(const std::string& javascript, const Awesomium::JSArguments& args)
+void Navi::evaluateJS(const std::string& javascript, const OSM::JSArguments& args)
 {
 	if(!webView)
 		return;
 
 	if(!args.size())
 	{
-		webView->executeJavascript(javascript);
+		awe_webview_execute_javascript(webView, OSM_STR(javascript), OSM_EMPTY());
 		return;
 	}
 
@@ -449,16 +452,20 @@ void Navi::evaluateJS(const std::string& javascript, const Awesomium::JSArgument
 		}
 	}
 
-	webView->executeJavascript(resultScript);
+	awe_webview_execute_javascript(webView, OSM_STR(resultScript), OSM_EMPTY());
 }
 
-Awesomium::FutureJSValue Navi::evaluateJSWithResult(const std::string& javascript, const Awesomium::JSArguments& args)
+OSM::JSValue Navi::evaluateJSWithResult(const std::string& javascript, const OSM::JSArguments& args)
 {
 	if(!webView)
-		return Awesomium::FutureJSValue();
+		return OSM::JSValue();
 
 	if(!args.size())
-		return webView->executeJavascriptWithResult(javascript);
+	{
+		awe_jsvalue* result = awe_webview_execute_javascript_with_result(webView, OSM::String(javascript).getInstance(), 
+			awe_string_empty(), 900);
+		return OSM::JSValue(result, true);
+	}
 	
 	std::string resultScript;
 	char paramName[15];
@@ -487,7 +494,11 @@ Awesomium::FutureJSValue Navi::evaluateJSWithResult(const std::string& javascrip
 		}
 	}
 
-	return webView->executeJavascriptWithResult(resultScript);
+	awe_jsvalue* result = awe_webview_execute_javascript_with_result(webView, 
+		OSM::String(resultScript).getInstance(), 
+		awe_string_empty(), 900);
+
+	return OSM::JSValue(result, true);
 }
 
 void Navi::bind(const std::string& name, const NaviDelegate& callback)
@@ -497,15 +508,16 @@ void Navi::bind(const std::string& name, const NaviDelegate& callback)
 
 	delegateMap[name] = callback;
 
-	webView->setObjectCallback(L"Client", std::wstring(name.begin(), name.end()));
+	awe_webview_set_object_callback(webView, OSM_STR("Client"), OSM_STR(name));
 }
 
-void Navi::setProperty(const std::string& name, const Awesomium::JSValue& value)
+void Navi::setProperty(const std::string& name, const OSM::JSValue& value)
 {
 	if(!webView)
 		return;
 
-	webView->setObjectProperty(L"Client", std::wstring(name.begin(), name.end()), value);
+	awe_webview_set_object_property(webView, OSM_STR("Client"), OSM_STR(name), 
+		(const awe_jsvalue*)(value.getInstance()));
 }
 
 void Navi::setTransparent(bool isTransparent)
@@ -530,7 +542,7 @@ void Navi::setTransparent(bool isTransparent)
 		}
 	}
 
-	webView->setTransparent(isTransparent);
+	awe_webview_set_transparent(webView, isTransparent);
 	isWebViewTransparent = isTransparent;
 }
 
@@ -768,7 +780,7 @@ void Navi::focus()
 	if(overlay)
 		NaviManager::GetPointer()->focusNavi(0, 0, this);
 	else
-		webView->focus();
+		awe_webview_focus(webView);
 }
 
 void Navi::moveNavi(int deltaX, int deltaY)
@@ -842,13 +854,13 @@ void Navi::getDerivedUV(Ogre::Real& u1, Ogre::Real& v1, Ogre::Real& u2, Ogre::Re
 void Navi::injectMouseMove(int xPos, int yPos)
 {
 	if(webView)
-		webView->injectMouseMove(xPos, yPos);
+		awe_webview_inject_mouse_move(webView, xPos, yPos);
 }
 
 void Navi::injectMouseWheel(int relScroll)
 {
 	if(webView)
-		webView->injectMouseWheel(relScroll);
+		awe_webview_inject_mouse_wheel(webView, relScroll, 0);
 }
 
 void Navi::injectMouseDown(int xPos, int yPos)
@@ -857,19 +869,23 @@ void Navi::injectMouseDown(int xPos, int yPos)
 		NaviManager::Get().handleKeyboardFocusChange(this, true);
 
 	if(webView)
-		webView->injectMouseDown(Awesomium::LEFT_MOUSE_BTN);
+		awe_webview_inject_mouse_down(webView, AWE_MB_LEFT);
 }
 
 void Navi::injectMouseUp(int xPos, int yPos)
 {
 	if(webView)
-		webView->injectMouseUp(Awesomium::LEFT_MOUSE_BTN);
+		awe_webview_inject_mouse_up(webView, AWE_MB_LEFT);
 }
 
 void Navi::captureImage(const std::string& filename)
 {
 	if(webView)
-		webView->render()->saveToJPEG(std::wstring(filename.begin(), filename.end()));
+	{
+		const awe_renderbuffer* buffer = awe_webview_render(webView);
+		if(buffer)
+			awe_renderbuffer_save_to_jpeg(buffer, OSM_STR(filename), 90);
+	}
 }
 
 void Navi::resize(int width, int height)
@@ -881,46 +897,44 @@ void Navi::resize(int width, int height)
 void Navi::setZoom(int percent)
 {
 	if(webView)
-		webView->setZoom(percent);
+		awe_webview_set_zoom(webView, percent);
 }
 
 void Navi::resetZoom()
 {
 	if(webView)
-		webView->resetZoom();
+		awe_webview_reset_zoom(webView);
 }
 
-
-
-void Navi::onBeginNavigation(Awesomium::WebView* caller, 
-									const std::string& url, 
-									const std::wstring& frameName)
+void Navi::onBeginNavigation(awe_webview* caller, 
+								   const OSM::String& url, 
+								   const OSM::String& frameName)
 {
-	onCallback(caller, L"Client", L"_beginNavigation", JSArgs(url)(std::string(frameName.begin(), frameName.end())));
+	onJSCallback(caller, L"Client", L"_beginNavigation", JSArgs(url, frameName));
 }
 
-void Navi::onBeginLoading(Awesomium::WebView* caller, 
-								 const std::string& url, 
-								 const std::wstring& frameName, 
-								 int statusCode, const std::wstring& mimeType)
+void Navi::onBeginLoading(awe_webview* caller, 
+									const OSM::String& url, 
+									const OSM::String& frameName, 
+									int statusCode, 
+									const OSM::String& mimeType)
 {
-	onCallback(caller, L"Client", L"_beginLoading", JSArgs(url)(std::string(frameName.begin(), 
-		frameName.end()))(statusCode)(std::string(mimeType.begin(), mimeType.end())));
+	onJSCallback(caller, L"Client", L"_beginLoading", JSArgs(url, frameName, statusCode, mimeType));
 }
 
-void Navi::onFinishLoading(Awesomium::WebView* caller)
+void Navi::onFinishLoading(awe_webview* caller)
 {
-	onCallback(caller, L"Client", L"_finishLoading", JSArgs());
+	onJSCallback(caller, L"Client", L"_finishLoading", JSArgs());
 }
 
-void Navi::onCallback(Awesomium::WebView* caller, 
-							 const std::wstring& objectName, 
-							 const std::wstring& callbackName, 
-							 const Awesomium::JSArguments& args)
+void Navi::onJSCallback(awe_webview* caller, 
+								const OSM::String& objectName, 
+								const OSM::String& callbackName, 
+								const OSM::JSArguments& args)
 {
-	if(objectName == L"Client")
+	if(objectName.str() == "Client")
 	{
-		std::string name = NaviUtilities::toMultibyte(callbackName);
+		std::string name = callbackName.str();
 
 		std::map<std::string, NaviDelegate>::iterator i = delegateMap.find(name);
 
@@ -929,123 +943,118 @@ void Navi::onCallback(Awesomium::WebView* caller,
 	}
 }
 
-void Navi::onReceiveTitle(Awesomium::WebView* caller, 
-								 const std::wstring& title, 
-								 const std::wstring& frameName)
+void Navi::onReceiveTitle(awe_webview* caller, 
+									const OSM::String& title, 
+									const OSM::String& frameName)
 {
-	onCallback(caller, L"Client", L"_receiveTitle", JSArgs(NaviUtilities::toMultibyte(title))(std::string(frameName.begin(), frameName.end())));
+	onJSCallback(caller, L"Client", L"_receiveTitle", JSArgs(title, frameName));
 }
 
-void Navi::onChangeTooltip(Awesomium::WebView* caller, 
-								  const std::wstring& tooltip)
+void Navi::onChangeTooltip(awe_webview* caller, 
+									 const OSM::String& tooltip)
 {
 	if(tooltipsEnabled)
-		NaviManager::Get().handleTooltip(this, tooltip);
+		NaviManager::Get().handleTooltip(this, tooltip.wstr());
 }
 
-void Navi::onChangeCursor(Awesomium::WebView* caller, 
-								 Awesomium::CursorType cursor)
+void Navi::onChangeCursor(awe_webview* caller, 
+									awe_cursor_type cursor)
 {
 }
 
-void Navi::onChangeKeyboardFocus(Awesomium::WebView* caller,
-										bool isFocused)
+void Navi::onChangeKeyboardFocus(awe_webview* caller, 
+										   bool isFocused)
 {
 	NaviManager::Get().handleKeyboardFocusChange(this, isFocused);
 	hasInternalKeyboardFocus = isFocused;
-	onCallback(caller, L"Client", L"_changeKeyboardFocus", JSArgs(isFocused));
+	onJSCallback(caller, L"Client", L"_changeKeyboardFocus", JSArgs(isFocused));
 }
 
-void Navi::onChangeTargetURL(Awesomium::WebView* caller, 
-									const std::string& url)
+void Navi::onChangeTargetURL(awe_webview* caller, 
+									   const OSM::String& url)
 {
-	onCallback(caller, L"Client", L"_changeTargetURL", JSArgs(url));
+	onJSCallback(caller, L"Client", L"_changeTargetURL", JSArgs(url));
 }
 
-void Navi::onOpenExternalLink(Awesomium::WebView* caller, 
-									 const std::string& url, 
-									 const std::wstring& source)
+void Navi::onOpenExternalLink(awe_webview* caller, 
+										const OSM::String& url, 
+										const OSM::String& source)
 {
-	onCallback(caller, L"Client", L"_openExternalLink", JSArgs(url)(source));
+	onJSCallback(caller, L"Client", L"_openExternalLink", JSArgs(url, source));
 }
 
-void Navi::onRequestDownload(Awesomium::WebView* caller,
-									const std::string& url)
+void Navi::onRequestDownload(awe_webview* caller,
+										const OSM::String& url)
 {
-	onCallback(caller, L"Client", L"_requestDownload", JSArgs(url));
+	onJSCallback(caller, L"Client", L"_requestDownload", JSArgs(url));
 }
 
-void Navi::onWebViewCrashed(Awesomium::WebView* caller)
+void Navi::onWebViewCrashed(awe_webview* caller)
 {
-	onCallback(caller, L"Client", L"_webViewCrashed", JSArgs());
+	onJSCallback(caller, L"Client", L"_webViewCrashed", JSArgs());
 }
 
-void Navi::onPluginCrashed(Awesomium::WebView* caller, 
-								  const std::wstring& pluginName)
-{
-}
-
-void Navi::onCreateWindow(Awesomium::WebView* caller, 
-								 Awesomium::WebView* createdWindow, 
-								 int width, int height)
+void Navi::onPluginCrashed(awe_webview* caller, 
+									 const OSM::String& pluginName)
 {
 }
 
-void Navi::onRequestMove(Awesomium::WebView* caller, int x, int y)
+void Navi::onRequestMove(awe_webview* caller, 
+								   int x, int y)
 {
 }
 
-void Navi::onGetPageContents(Awesomium::WebView* caller, 
-									const std::string& url, 
-									const std::wstring& contents)
+void Navi::onGetPageContents(awe_webview* caller, 
+									   const OSM::String& url, 
+									   const OSM::String& contents)
 {
 }
 
-void Navi::onDOMReady(Awesomium::WebView* caller)
+void Navi::onDOMReady(awe_webview* caller)
 {
-	onCallback(caller, L"Client", L"_DOMReady", JSArgs());
+	onJSCallback(caller, L"Client", L"_DOMReady", JSArgs());
 }
 
-void Navi::onRequestFileChooser(Awesomium::WebView* caller,
-								  bool selectMultipleFiles,
-								  const std::wstring& title,
-								  const std::wstring& defaultPath)
-{
-}
-
-void Navi::onGetScrollData(Awesomium::WebView* caller,
-							 int contentWidth,
-							 int contentHeight,
-							 int preferredWidth,
-							 int scrollX,
-							 int scrollY)
+void Navi::onRequestFileChooser(awe_webview* caller,
+										  bool selectMultipleFiles,
+										  const OSM::String& title,
+										  const OSM::String& defaultPath)
 {
 }
 
-void Navi::onJavascriptConsoleMessage(Awesomium::WebView* caller,
-										const std::wstring& message,
+void Navi::onGetScrollData(awe_webview* caller,
+									 int contentWidth,
+									 int contentHeight,
+									 int preferredWidth,
+									 int scrollX,
+									 int scrollY)
+{
+}
+
+void Navi::onJSConsoleMessage(awe_webview* caller,
+										const OSM::String& message,
 										int lineNumber,
-										const std::wstring& source)
+										const OSM::String& source)
 {
 }
 
-void Navi::onGetFindResults(Awesomium::WebView* caller,
-                              int requestID,
-                              int numMatches,
-                              const Awesomium::Rect& selection,
-                              int curMatch,
-                              bool finalUpdate)
+void Navi::onGetFindResults(awe_webview* caller,
+									  int requestID,
+									  int numMatches,
+									  awe_rect selection,
+									  int curMatch,
+									  bool finalUpdate)
 {
 }
 
 
-void Navi::onUpdateIME(Awesomium::WebView* caller,
-                         Awesomium::IMEState imeState,
-                         const Awesomium::Rect& caretRect)
+void Navi::onUpdateIME(awe_webview* caller,
+								 awe_ime_state imeState,
+								 awe_rect caretRect)
 {
 }
 
-void Navi::onRequestDrag(Navi *caller, const Awesomium::JSArguments &args)
+void Navi::onRequestDrag(Navi *caller, const OSM::JSArguments &args)
 {
 	if(overlay)
 		NaviManager::Get().handleRequestDrag(this);

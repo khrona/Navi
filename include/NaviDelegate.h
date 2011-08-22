@@ -9,7 +9,7 @@
 #ifndef __NaviDelegate_H__
 #define __NaviDelegate_H__
 #include <memory.h>
-#include <Awesomium/JSValue.h>
+#include <Awesomium/awesomium_capi.h>
 
 #define FASTDELEGATE_USESTATICFUNCTIONHACK
 #if defined(_MSC_VER) && !defined(__MWERKS__) && !defined(__VECTOR_C) && !defined(__ICL) && !defined(__BORLANDC__)
@@ -478,14 +478,14 @@ namespace NaviLibrary {
 	class Navi;
 
 	/*
-	* Functions assigned to a NaviDelegate must return a 'void' and have two arguments: 'Navi* caller, const Awesomium::JSArguments& args'
+	* Functions assigned to a NaviDelegate must return a 'void' and have two arguments: 'Navi* caller, const OSM::JSArguments& args'
 	*
 	* Member function instantiation example: NaviDelegate(this, &MyClass::myMemberFunction)
 	* Member function instantiation example: NaviDelegate(pointerToSexyClass, &SexyClass::mySexyFunction)
 	*
 	* Static function instantiation example: NaviDelegate(&myStaticFunction)
 	*/
-	typedef ::Impl::fastdelegate::FastDelegate2<Navi*, const Awesomium::JSArguments&, void> NaviDelegate;
+	typedef ::Impl::fastdelegate::FastDelegate2<Navi*, const OSM::JSArguments&, void> NaviDelegate;
 }
 
 #endif

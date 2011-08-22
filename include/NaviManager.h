@@ -35,7 +35,6 @@
 #include <OGRE/Ogre.h>
 #include <OGRE/OgrePanelOverlayElement.h>
 #include "KeyboardHook.h"
-#include <Awesomium/WebCore.h>
 #include "NaviOverlay.h"
 #include "NaviDelegate.h"
 
@@ -301,7 +300,6 @@ namespace NaviLibrary
 	protected:
 		friend class Navi; // Our very close friend <3
 
-		Awesomium::WebCore* webCore;
 		std::map<std::string,Navi*> activeNavis;
 		Navi* focusedNavi, *tooltipNavi, *tooltipParent, *keyboardFocusedNavi;
 		std::map<std::string,Navi*>::iterator iter;
@@ -314,18 +312,18 @@ namespace NaviLibrary
 		double lastTooltip, tooltipShowTime;
 		bool isDraggingFocusedNavi;
 		bool isFocusedNaviModal;
-		struct CallbackInvocation { Navi* caller; Awesomium::JSArguments args; NaviDelegate callback; };
+		struct CallbackInvocation { Navi* caller; OSM::JSArguments args; NaviDelegate callback; };
 		std::deque<CallbackInvocation> queuedCallbacks;
 
 		bool focusNavi(int x, int y, Navi* selection = 0);
 		void handleKeyMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		void onResizeTooltip(Navi* Navi, const Awesomium::JSArguments& args);
+		void onResizeTooltip(Navi* Navi, const OSM::JSArguments& args);
 		void handleTooltip(Navi* tooltipParent, const std::wstring& tipText);
 		void handleRequestDrag(Navi* caller);
 		void handleKeyboardFocusChange(Navi* caller, bool isFocused);
 		void setNaviModality(Navi* caller, bool isModal);
 		void handleNaviHide(Navi* caller);
-		void queueCallback(Navi* caller, const Awesomium::JSArguments& args, const NaviDelegate& callback);
+		void queueCallback(Navi* caller, const OSM::JSArguments& args, const NaviDelegate& callback);
 		void moveTooltip(int x, int y);
 	};
 

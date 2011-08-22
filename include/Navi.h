@@ -32,7 +32,7 @@ namespace NaviLibrary
 	* The core component of NaviLibrary, an offscreen browser window rendered to a dynamic texture (encapsulated 
 	* as an Ogre Material) that can optionally be attached to an overlay and manipulated within a scene.
 	*/
-	class _NaviExport Navi : public Ogre::ManualResourceLoader, public Awesomium::WebViewListener
+	class _NaviExport Navi : public Ogre::ManualResourceLoader, public OSM::WebViewListener
 	{
 	public:
 
@@ -71,12 +71,12 @@ namespace NaviLibrary
 		*	\code
 		*	using namespace NaviLibrary::NaviUtilities;
 		*	
-		*	myNavi->evaluateJS("newCharacter(?, ?, ?)", JSArgs(nickname)(characterType)(level));
+		*	myNavi->evaluateJS("newCharacter(?, ?, ?)", JSArgs(nickname, characterType, level));
 		*
-		*	myNavi->evaluateJS("document.getElementById(?).innerHTML = ?", JSArgs("chatElement")(chatText));
+		*	myNavi->evaluateJS("document.getElementById(?).innerHTML = ?", JSArgs("chatElement", chatText));
 		*	\endcode
 		*/
-		void evaluateJS(const std::string& javascript, const Awesomium::JSArguments& args = NaviUtilities::JSArgs());
+		void evaluateJS(const std::string& javascript, const OSM::JSArguments& args = OSM::JSArguments());
 
 		/**
 		* Evaluates Javascript in the context of the current page and returns a handle to a future result.
@@ -92,7 +92,7 @@ namespace NaviLibrary
 		*		actual value at a later time (using FutureJSValue::get). If you are unfamiliar with the concept 
 		*		of a 'Future', please see: http://en.wikipedia.org/wiki/Futures_and_promises>.
 		*/
-		Awesomium::FutureJSValue evaluateJSWithResult(const std::string& javascript, const Awesomium::JSArguments& args = NaviUtilities::JSArgs());
+		OSM::JSValue evaluateJSWithResult(const std::string& javascript, const OSM::JSArguments& args = OSM::JSArguments());
 
 		/**
 		* Sets a global 'Client' callback that can be invoked via Javascript from
@@ -102,7 +102,7 @@ namespace NaviLibrary
 		* @param	callback	The C++ callback to invoke when called via Javascript.
 		*
 		* @note	All C++ callbacks should follow the general form of:
-		*		void myCallback(Navi* caller, const Awesomium::JSArgs& args)
+		*		void myCallback(Navi* caller, const OSM::JSArgs& args)
 		*		{
 		*		}
 		*
@@ -130,7 +130,7 @@ namespace NaviLibrary
 		*		if you set the property with a name of 'color' and a value of 'blue', you could access
 		*		this from the page using Javascript: document.write("The color is " + Client.color);
 		*/
-		void setProperty(const std::string& name, const Awesomium::JSValue& value);
+		void setProperty(const std::string& name, const OSM::JSValue& value);
 
 		/**
 		* Attempts to render the background of all pages loaded into this Navi as transparent.
@@ -421,7 +421,7 @@ namespace NaviLibrary
 		void resetZoom();
 
 	protected:
-		Awesomium::WebView* webView;
+		awe_webview* webView;
 		std::string naviName;
 		unsigned short naviWidth;
 		unsigned short naviHeight;
@@ -483,92 +483,89 @@ namespace NaviLibrary
 		bool isPointOverMe(int x, int y);
 
 
-		virtual void onBeginNavigation(Awesomium::WebView* caller, 
-									   const std::string& url, 
-									   const std::wstring& frameName);
+		virtual void onBeginNavigation(awe_webview* caller, 
+								   const OSM::String& url, 
+								   const OSM::String& frameName);
+	
+		virtual void onBeginLoading(awe_webview* caller, 
+									const OSM::String& url, 
+									const OSM::String& frameName, 
+									int statusCode, 
+									const OSM::String& mimeType);
 		
-		virtual void onBeginLoading(Awesomium::WebView* caller, 
-									const std::string& url, 
-									const std::wstring& frameName, 
-									int statusCode, const std::wstring& mimeType);
-		
-		virtual void onFinishLoading(Awesomium::WebView* caller);
-		
-		virtual void onCallback(Awesomium::WebView* caller, 
-								const std::wstring& objectName, 
-								const std::wstring& callbackName, 
-								const Awesomium::JSArguments& args);
-		
-		virtual void onReceiveTitle(Awesomium::WebView* caller, 
-									const std::wstring& title, 
-									const std::wstring& frameName);
-		
-		virtual void onChangeTooltip(Awesomium::WebView* caller, 
-									 const std::wstring& tooltip);
-		
-		virtual void onChangeCursor(Awesomium::WebView* caller, 
-									Awesomium::CursorType cursor);
+		virtual void onFinishLoading(awe_webview* caller);
 
-		virtual void onChangeKeyboardFocus(Awesomium::WebView* caller,
+		virtual void onJSCallback(awe_webview* caller, 
+								const OSM::String& objectName, 
+								const OSM::String& callbackName, 
+								const OSM::JSArguments& args);
+		
+		virtual void onReceiveTitle(awe_webview* caller, 
+									const OSM::String& title, 
+									const OSM::String& frameName);
+		
+		virtual void onChangeTooltip(awe_webview* caller, 
+									 const OSM::String& tooltip);
+		
+		virtual void onChangeCursor(awe_webview* caller, 
+									awe_cursor_type cursor);
+		
+		virtual void onChangeKeyboardFocus(awe_webview* caller, 
 										   bool isFocused);
-		
-		virtual void onChangeTargetURL(Awesomium::WebView* caller, 
-									   const std::string& url);
-		
-		virtual void onOpenExternalLink(Awesomium::WebView* caller, 
-										const std::string& url, 
-										const std::wstring& source);
 
-		virtual void onRequestDownload(Awesomium::WebView* caller,
-									   const std::string& url);
+		virtual void onChangeTargetURL(awe_webview* caller, 
+									   const OSM::String& url);
 		
-		virtual void onWebViewCrashed(Awesomium::WebView* caller);
-		
-		virtual void onPluginCrashed(Awesomium::WebView* caller, 
-									 const std::wstring& pluginName);
-		
-		virtual void onCreateWindow(Awesomium::WebView* caller, 
-									Awesomium::WebView* createdWindow, 
-									int width, int height);
-		
-		virtual void onRequestMove(Awesomium::WebView* caller, int x, int y);
-		
-		virtual void onGetPageContents(Awesomium::WebView* caller, 
-									   const std::string& url, 
-									   const std::wstring& contents);
-		
-		virtual void onDOMReady(Awesomium::WebView* caller);
+		virtual void onOpenExternalLink(awe_webview* caller, 
+										const OSM::String& url, 
+										const OSM::String& source);
 
-		virtual void onRequestFileChooser(Awesomium::WebView* caller,
+		virtual void onRequestDownload(awe_webview* caller,
+										const OSM::String& url);
+		
+		virtual void onWebViewCrashed(awe_webview* caller);
+		
+		virtual void onPluginCrashed(awe_webview* caller, 
+									 const OSM::String& pluginName);
+		
+		virtual void onRequestMove(awe_webview* caller, 
+								   int x, int y);
+		
+		virtual void onGetPageContents(awe_webview* caller, 
+									   const OSM::String& url, 
+									   const OSM::String& contents);
+		
+		virtual void onDOMReady(awe_webview* caller);
+
+		virtual void onRequestFileChooser(awe_webview* caller,
 										  bool selectMultipleFiles,
-										  const std::wstring& title,
-										  const std::wstring& defaultPath);
+										  const OSM::String& title,
+										  const OSM::String& defaultPath);
 
-		virtual void onGetScrollData(Awesomium::WebView* caller,
+		virtual void onGetScrollData(awe_webview* caller,
 									 int contentWidth,
 									 int contentHeight,
 									 int preferredWidth,
 									 int scrollX,
 									 int scrollY);
-		
-		virtual void onJavascriptConsoleMessage(Awesomium::WebView* caller,
-												const std::wstring& message,
-												int lineNumber,
-												const std::wstring& source);
 
-		virtual void onGetFindResults(Awesomium::WebView* caller,
-                                      int requestID,
-                                      int numMatches,
-                                      const Awesomium::Rect& selection,
-                                      int curMatch,
-                                      bool finalUpdate);
+		virtual void onJSConsoleMessage(awe_webview* caller,
+										const OSM::String& message,
+										int lineNumber,
+										const OSM::String& source);
 
+		virtual void onGetFindResults(awe_webview* caller,
+									  int requestID,
+									  int numMatches,
+									  awe_rect selection,
+									  int curMatch,
+									  bool finalUpdate);
 
-		virtual void onUpdateIME(Awesomium::WebView* caller,
-                                 Awesomium::IMEState imeState,
-                                 const Awesomium::Rect& caretRect);
+		virtual void onUpdateIME(awe_webview* caller,
+								 awe_ime_state imeState,
+								 awe_rect caretRect);
 
-		void onRequestDrag(Navi* caller, const Awesomium::JSArguments& args);
+		virtual void onRequestDrag(Navi *caller, const OSM::JSArguments &args);
 	};
 }
 

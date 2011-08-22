@@ -37,14 +37,12 @@ template<> NaviManager* Singleton<NaviManager>::instance = 0;
 #define TIP_ENTRY_DELAY 2.0
 
 NaviManager::NaviManager(Ogre::Viewport* defaultViewport, const std::string &baseDirectory)
-	: webCore(0), focusedNavi(0), mouseXPos(0), mouseYPos(0), mouseButtonRDown(false), mouseButtonLDown(false), zOrderCounter(5), 
+	: focusedNavi(0), mouseXPos(0), mouseYPos(0), mouseButtonRDown(false), mouseButtonLDown(false), zOrderCounter(5), 
 	defaultViewport(defaultViewport), tooltipParent(0), lastTooltip(0), tooltipShowTime(0), isDraggingFocusedNavi(0),
 	keyboardFocusedNavi(0), isFocusedNaviModal(false)
 {
-	Awesomium::WebCoreConfig config;
-	config.setEnableDatabases(true);
-	webCore = new Awesomium::WebCore(config);
-	webCore->setBaseDirectory(NaviUtilities::getCurrentWorkingDirectory() + baseDirectory + "\\");
+	awe_webcore_initialize_default();
+	awe_webcore_set_base_directory(OSM_STR(NaviUtilities::getCurrentWorkingDirectory() + baseDirectory + "\\"));
 	keyboardHook = new Impl::KeyboardHook(this);
 
 	tooltipNavi = new Navi("__tooltip", 250, 50, NaviPosition(0, 0), false, 70, 199, Front, defaultViewport);
@@ -67,8 +65,7 @@ NaviManager::~NaviManager()
 
 	delete tooltipNavi;
 
-	if(webCore)
-		delete webCore;
+	awe_webcore_shutdown();
 }
 
 NaviManager& NaviManager::Get()
@@ -88,7 +85,7 @@ NaviManager* NaviManager::GetPointer()
 
 void NaviManager::Update()
 {
-	webCore->update();
+	awe_webcore_update();
 
 	while(queuedCallbacks.size())
 	{
@@ -200,8 +197,8 @@ void NaviManager::destroyNavi(Navi* naviToDestroy)
 
 			// Update the webCore here to grab any queued callback events for this thread
 			// before clearing those specific to the Navi being destroyed
-			webCore->update();
-
+			awe_webcore_update();
+	
 			for(std::deque<CallbackInvocation>::iterator i = queuedCallbacks.begin(); i != queuedCallbacks.end();)
 			{
 				if(i->caller == naviToDestroy)
@@ -432,7 +429,7 @@ bool NaviManager::focusNavi(int x, int y, Navi* selection)
 	}
 
 	focusedNavi = naviToFocus;
-	focusedNavi->webView->focus();
+	awe_webview_focus(focusedNavi->webView);
 	isDraggingFocusedNavi = false;
 	keyboardFocusedNavi = focusedNavi->hasInternalKeyboardFocus? focusedNavi : 0;
 
@@ -472,7 +469,7 @@ void NaviManager::setDefaultViewport(Ogre::Viewport* viewport)
 void NaviManager::deFocusAllNavis()
 {
 	for(iter = activeNavis.begin(); iter != activeNavis.end(); iter++)
-		iter->second->webView->unfocus();
+		awe_webview_unfocus(iter->second->webView);
 
 	focusedNavi = 0;
 	isDraggingFocusedNavi = false;
@@ -483,16 +480,16 @@ void NaviManager::deFocusAllNavis()
 void NaviManager::handleKeyMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if(keyboardFocusedNavi && keyboardFocusedNavi != focusedNavi)
-		keyboardFocusedNavi->webView->injectKeyboardEvent(Awesomium::WebKeyboardEvent(msg, wParam, lParam));
+		awe_webview_inject_keyboard_event_win(keyboardFocusedNavi->webView, msg, wParam, lParam);
 	else if(focusedNavi)
-		focusedNavi->webView->injectKeyboardEvent(Awesomium::WebKeyboardEvent(msg, wParam, lParam));		
+		awe_webview_inject_keyboard_event_win(focusedNavi->webView, msg, wParam, lParam);		
 
 	for(iter = activeNavis.begin(); iter != activeNavis.end(); iter++)
 		if(iter->second->alwaysReceivesKeyboard && iter->second != keyboardFocusedNavi)
-			iter->second->webView->injectKeyboardEvent(Awesomium::WebKeyboardEvent(msg, wParam, lParam));
+			awe_webview_inject_keyboard_event_win(iter->second->webView, msg, wParam, lParam);	
 }
 
-void NaviManager::onResizeTooltip(Navi* Navi, const Awesomium::JSArguments& args)
+void NaviManager::onResizeTooltip(Navi* Navi, const OSM::JSArguments& args)
 {
 	if(args.size() != 2 || !tooltipParent)
 		return;
@@ -519,7 +516,7 @@ void NaviManager::handleTooltip(Navi* tooltipParent, const std::wstring& tipText
 	if(tipText.length())
 	{
 		this->tooltipParent = tooltipParent;
-		tooltipNavi->evaluateJS("setTooltip(?)", JSArgs(std::string(tipText.begin(), tipText.end())));
+		tooltipNavi->evaluateJS("setTooltip(?)", JSArgs(tipText));
 	}
 	else
 	{
@@ -541,7 +538,7 @@ void NaviManager::handleKeyboardFocusChange(Navi* caller, bool isFocused)
 		{
 			if(!caller->getOverlay()->getVisibility())
 			{
-				caller->webView->unfocus();
+				awe_webview_unfocus(caller->webView);
 
 				if(keyboardFocusedNavi == caller)
 					keyboardFocusedNavi = 0;
@@ -551,11 +548,11 @@ void NaviManager::handleKeyboardFocusChange(Navi* caller, bool isFocused)
 		}				
 
 		keyboardFocusedNavi = caller;
-		keyboardFocusedNavi->webView->focus();
+		awe_webview_focus(keyboardFocusedNavi->webView);
 
 		for(iter = activeNavis.begin(); iter != activeNavis.end(); iter++)
 			if(iter->second != keyboardFocusedNavi)
-				iter->second->webView->unfocus();
+				awe_webview_unfocus(iter->second->webView);
 	}
 	else if(caller == keyboardFocusedNavi)
 	{
@@ -591,13 +588,13 @@ void NaviManager::handleNaviHide(Navi* caller)
 
 		if(keyboardFocusedNavi == caller)
 		{
-			keyboardFocusedNavi->webView->unfocus();
+			awe_webview_unfocus(keyboardFocusedNavi->webView);
 			keyboardFocusedNavi = 0;
 		}
 	}
 }
 
-void NaviManager::queueCallback(Navi* caller, const Awesomium::JSArguments& args, const NaviDelegate& callback)
+void NaviManager::queueCallback(Navi* caller, const OSM::JSArguments& args, const NaviDelegate& callback)
 {
 	CallbackInvocation invocation;
 	invocation.caller = caller;

@@ -24,7 +24,10 @@
 #define __NaviUtilities_H__
 
 #include "NaviPlatform.h"
-#include <Awesomium/WebCore.h>
+#include <Awesomium/awesomium_capi.h>
+#include "awesomium_capi_helpers.h"
+#include <vector>
+#include <map>
 #include <string>
 #include <iomanip>
 
@@ -224,35 +227,118 @@ namespace NaviLibrary
 		* This is a simple way to quickly make inline JSValue vectors (which is really
 		* useful when declaring arguments to pass to Navi::evaluateJS).
 		*
-		* Syntax is: \code JSArgs(x)(x)(x)(x)... \endcode
+		* Syntax is: \code JSArgs(x, x, x, x,...) \endcode
 		*
 		* @note
 		*	For example:
 		*	\code
 		*	// Before:
-		*	Awesomium::JSArguments myArgs;
+		*	OSM::JSArguments myArgs;
 		*	myArgs.push_back("hello there");
 		*	myArgs.push_back(3.1416);
 		*	myArgs.push_back(1337);
 		*	myNavi->evaluateJS("displayInfo(?, ?, ?)", myArgs);
 		*
 		*	// After:
-		*	myNavi->evaluateJS("displayInfo(?, ?, ?)", JSArgs("hello there")(3.1416)(1337));
+		*	myNavi->evaluateJS("displayInfo(?, ?, ?)", JSArgs("hello there", 3.1416, 1337));
 		*	\endcode
 		*/
-		class _NaviExport JSArgs : public std::vector<Awesomium::JSValue>
+		class _NaviExport JSArgs
 		{
+			OSM::JSArguments args;
 		public:
 			JSArgs() { }
 
-			JSArgs(JSArgs &v) { this->swap(v); }
+			explicit JSArgs(const OSM::JSValue &firstArg) : args(1, firstArg) { }
 
-			explicit JSArgs(const Awesomium::JSValue &firstArg) : std::vector<Awesomium::JSValue>(1, firstArg) { }
-
-			JSArgs& operator()(const Awesomium::JSValue &newArg) 
+			JSArgs(const OSM::JSValue& a1, const OSM::JSValue& a2)
 			{
-				this->push_back(newArg);
-				return *this;
+				args.push_back(a1);
+				args.push_back(a2);
+			}
+
+			JSArgs(const OSM::JSValue& a1, const OSM::JSValue& a2, const OSM::JSValue& a3)
+			{
+				args.push_back(a1);
+				args.push_back(a2);
+				args.push_back(a3);
+			}
+
+			JSArgs(const OSM::JSValue& a1, const OSM::JSValue& a2, const OSM::JSValue& a3,
+				const OSM::JSValue& a4)
+			{
+				args.push_back(a1);
+				args.push_back(a2);
+				args.push_back(a3);
+				args.push_back(a4);
+			}
+
+			JSArgs(const OSM::JSValue& a1, const OSM::JSValue& a2, const OSM::JSValue& a3,
+				const OSM::JSValue& a4, const OSM::JSValue& a5)
+			{
+				args.push_back(a1);
+				args.push_back(a2);
+				args.push_back(a3);
+				args.push_back(a4);
+				args.push_back(a5);
+			}
+
+			JSArgs(const OSM::JSValue& a1, const OSM::JSValue& a2, const OSM::JSValue& a3,
+				const OSM::JSValue& a4, const OSM::JSValue& a5, const OSM::JSValue& a6)
+			{
+				args.push_back(a1);
+				args.push_back(a2);
+				args.push_back(a3);
+				args.push_back(a4);
+				args.push_back(a5);
+				args.push_back(a6);
+			}
+
+			JSArgs(const OSM::JSValue& a1, const OSM::JSValue& a2, const OSM::JSValue& a3,
+				const OSM::JSValue& a4, const OSM::JSValue& a5, const OSM::JSValue& a6, 
+				const OSM::JSValue& a7)
+			{
+				args.push_back(a1);
+				args.push_back(a2);
+				args.push_back(a3);
+				args.push_back(a4);
+				args.push_back(a5);
+				args.push_back(a6);
+				args.push_back(a7);
+			}
+
+			JSArgs(const OSM::JSValue& a1, const OSM::JSValue& a2, const OSM::JSValue& a3,
+				const OSM::JSValue& a4, const OSM::JSValue& a5, const OSM::JSValue& a6, 
+				const OSM::JSValue& a7, const OSM::JSValue& a8)
+			{
+				args.push_back(a1);
+				args.push_back(a2);
+				args.push_back(a3);
+				args.push_back(a4);
+				args.push_back(a5);
+				args.push_back(a6);
+				args.push_back(a7);
+				args.push_back(a8);
+			}
+
+			JSArgs(const OSM::JSValue& a1, const OSM::JSValue& a2, const OSM::JSValue& a3,
+				const OSM::JSValue& a4, const OSM::JSValue& a5, const OSM::JSValue& a6, 
+				const OSM::JSValue& a7, const OSM::JSValue& a8, const OSM::JSValue& a9)
+			{
+				args.push_back(a1);
+				args.push_back(a2);
+				args.push_back(a3);
+				args.push_back(a4);
+				args.push_back(a5);
+				args.push_back(a6);
+				args.push_back(a7);
+				args.push_back(a8);
+				args.push_back(a9);
+			}
+
+			operator OSM::JSArguments() const
+			{
+				return args;
 			}
 		};
 

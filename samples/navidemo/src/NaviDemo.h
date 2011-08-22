@@ -30,7 +30,6 @@
 #include "TitleCanvas.h"
 
 using namespace NaviLibrary;
-using namespace Awesomium;
 
 class PlaneObject 
 {
@@ -97,25 +96,25 @@ public:
 
 	void Update();
 
-	void onCreate(Navi* caller, const JSArguments& args);
-	void onExamples(Navi* caller, const JSArguments& args);
-	void onHelp(Navi* caller, const JSArguments& args);
-	void onExit(Navi* caller, const JSArguments& args);
+	void onCreate(Navi* caller, const OSM::JSArguments& args);
+	void onExamples(Navi* caller, const OSM::JSArguments& args);
+	void onHelp(Navi* caller, const OSM::JSArguments& args);
+	void onExit(Navi* caller, const OSM::JSArguments& args);
 
-	void onGoBack(Navi* caller, const JSArguments& args);
-	void onGoForward(Navi* caller, const JSArguments& args);
-	void onNavigateTo(Navi* caller, const JSArguments& args);
-	void onToggleFullscreen(Navi* caller, const JSArguments& args);
-	void onDestroy(Navi* caller, const JSArguments& args);
+	void onGoBack(Navi* caller, const OSM::JSArguments& args);
+	void onGoForward(Navi* caller, const OSM::JSArguments& args);
+	void onNavigateTo(Navi* caller, const OSM::JSArguments& args);
+	void onToggleFullscreen(Navi* caller, const OSM::JSArguments& args);
+	void onDestroy(Navi* caller, const OSM::JSArguments& args);
 
-	void onBeginNavigation(Navi* caller, const JSArguments& args);
-	void onBeginLoading(Navi* caller, const JSArguments& args);
-	void onFinishLoading(Navi* caller, const JSArguments& args);
-	void onReceiveTitle(Navi* caller, const JSArguments& args);
-	void onChangeTargetURL(Navi* caller, const JSArguments& args);
-	void onChangeKeyboardFocus(Navi* caller, const JSArguments& args);
-	void onOpenExternalLink(Navi* caller, const JSArguments& args);
-	void onWebViewCrashed(Navi* caller, const JSArguments& args);
+	void onBeginNavigation(Navi* caller, const OSM::JSArguments& args);
+	void onBeginLoading(Navi* caller, const OSM::JSArguments& args);
+	void onFinishLoading(Navi* caller, const OSM::JSArguments& args);
+	void onReceiveTitle(Navi* caller, const OSM::JSArguments& args);
+	void onChangeTargetURL(Navi* caller, const OSM::JSArguments& args);
+	void onChangeKeyboardFocus(Navi* caller, const OSM::JSArguments& args);
+	void onOpenExternalLink(Navi* caller, const OSM::JSArguments& args);
+	void onWebViewCrashed(Navi* caller, const OSM::JSArguments& args);
 
 	Ogre::ManualObject* createManualPlane(const std::string& name, int width, int height, const std::string& matName, Ogre::Real u2 = 1, Ogre::Real v2 = 1);
 	void focusGate(NaviGate* gate);
