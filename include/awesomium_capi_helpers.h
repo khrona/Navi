@@ -114,6 +114,8 @@ public:
 	JSValue(awe_jsvalue* instance, bool ownsInstance);
 	
 	~JSValue();
+
+	JSValue& operator=(const JSValue& rhs);
 	
 	/// Returns whether or not this JSValue is a boolean.
 	bool isBoolean() const;

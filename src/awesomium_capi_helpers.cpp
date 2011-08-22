@@ -19,7 +19,7 @@ awe_jsvalue* CreateJSValueFromArray(const JSValue::Array& value)
 		size_t idx = 0;
 		for(JSValue::Array::const_iterator i = value.begin(); i != value.end(); i++)
 		{
-			valArray[idx] = i->getInstance();
+			valArray[idx++] = i->getInstance();
 		}
 
 		awe_jsarray* jsarray = awe_jsarray_create((const awe_jsvalue**)valArray, value.size());
@@ -45,6 +45,58 @@ awe_jsvalue* CreateJSValueFromObject(const JSValue::Object& value)
 	instance = awe_jsvalue_create_object_value(jsobject);
 
 	awe_jsobject_destroy(jsobject);
+
+	return instance;
+}
+
+awe_jsvalue* CreateJSValueFromCopy(const JSValue& original)
+{
+	awe_jsvalue* instance = 0;
+	awe_jsvalue_type srcType = awe_jsvalue_get_type(original.getInstance());
+
+	switch(srcType)
+	{
+	case JSVALUE_TYPE_NULL:
+		{
+			instance = awe_jsvalue_create_null_value();
+			break;
+		}
+	case JSVALUE_TYPE_BOOLEAN:
+		{
+			instance = awe_jsvalue_create_bool_value(original.toBoolean());
+			break;
+		}
+	case JSVALUE_TYPE_INTEGER:
+		{
+			instance = awe_jsvalue_create_integer_value(original.toInteger());
+			break;
+		}
+	case JSVALUE_TYPE_DOUBLE:
+		{
+			instance = awe_jsvalue_create_double_value(original.toDouble());
+			break;
+		}
+	case JSVALUE_TYPE_STRING:
+		{
+			OSM::String srcString = original.toString();
+			instance = awe_jsvalue_create_string_value(srcString.getInstance());
+			break;
+		}
+	case JSVALUE_TYPE_ARRAY:
+		{
+			instance = CreateJSValueFromArray(original.getArray());
+			break;
+		}
+	case JSVALUE_TYPE_OBJECT:
+		{
+			instance = CreateJSValueFromObject(original.getObject());
+			break;
+		}
+	default:
+		{
+			instance = awe_jsvalue_create_null_value();
+		}
+	};
 
 	return instance;
 }
@@ -258,52 +310,7 @@ JSValue::JSValue(const Array& value)
 
 JSValue::JSValue(const JSValue& original)
 {
-	awe_jsvalue_type srcType = awe_jsvalue_get_type(original.getInstance());
-
-	switch(srcType)
-	{
-	case JSVALUE_TYPE_NULL:
-		{
-			instance = awe_jsvalue_create_null_value();
-			break;
-		}
-	case JSVALUE_TYPE_BOOLEAN:
-		{
-			instance = awe_jsvalue_create_bool_value(original.toBoolean());
-			break;
-		}
-	case JSVALUE_TYPE_INTEGER:
-		{
-			instance = awe_jsvalue_create_integer_value(original.toInteger());
-			break;
-		}
-	case JSVALUE_TYPE_DOUBLE:
-		{
-			instance = awe_jsvalue_create_double_value(original.toDouble());
-			break;
-		}
-	case JSVALUE_TYPE_STRING:
-		{
-			OSM::String srcString = original.toString();
-			instance = awe_jsvalue_create_string_value(srcString.getInstance());
-			break;
-		}
-	case JSVALUE_TYPE_ARRAY:
-		{
-			instance = CreateJSValueFromArray(original.getArray());
-			break;
-		}
-	case JSVALUE_TYPE_OBJECT:
-		{
-			instance = CreateJSValueFromObject(original.getObject());
-			break;
-		}
-	default:
-		{
-			instance = awe_jsvalue_create_null_value();
-		}
-	};
-
+	instance = CreateJSValueFromCopy(original);
 	ownsInstance = true;
 }
 
@@ -317,6 +324,16 @@ JSValue::~JSValue()
 {
 	if(instance && ownsInstance)
 		awe_jsvalue_destroy(instance);
+}
+
+JSValue& JSValue::operator=(const JSValue& rhs)
+{
+	if(instance && ownsInstance)
+		awe_jsvalue_destroy(instance);
+
+	instance = CreateJSValueFromCopy(rhs);
+	ownsInstance = true;
+	return *this;
 }
 
 /// Returns whether or not this JSValue is a boolean.
