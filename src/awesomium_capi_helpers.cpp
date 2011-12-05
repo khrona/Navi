@@ -681,6 +681,7 @@ void WebViewEventHelper::addListener(awe_webview* webView, WebViewListener* list
 
 	listenerMap[webView] = listener;
 
+	BIND(begin_navigation);
 	BIND(begin_loading);
 	BIND(finish_loading);
 	BIND(js_callback);
@@ -710,6 +711,7 @@ void WebViewEventHelper::removeListener(awe_webview* webView)
 	if(i != listenerMap.end())
 		listenerMap.erase(i);
 
+	UNBIND(begin_navigation);
 	UNBIND(begin_loading);
 	UNBIND(finish_loading);
 	UNBIND(js_callback);

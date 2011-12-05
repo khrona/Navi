@@ -6,12 +6,10 @@ A full sample application (NaviDemo) is included that demonstrates usage of both
 
 ## Dependencies
 
-This version depends on Awesomium 1.6.2, Ogre 1.7.2, and Visual Studio 2008.
+This version depends on Awesomium 1.6.3, Ogre 1.7.2, and Visual Studio 2008+.
 
 1. You will need to install the Ogre3D SDK (make sure it registers the OGRE_HOME environment path).
-2. You will also need to download and unzip the Awesomium SDK to the following path:
-
-    dependencies/win/awesomium_v1.6.2_sdk_win
+2. You will also need to download and install the Awesomium 1.6.3 SDK.
 	
 You can download Awesomium from http://www.awesomium.com/download
 

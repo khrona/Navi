@@ -41,7 +41,15 @@ NaviManager::NaviManager(Ogre::Viewport* defaultViewport, const std::string &bas
 	defaultViewport(defaultViewport), tooltipParent(0), lastTooltip(0), tooltipShowTime(0), isDraggingFocusedNavi(0),
 	keyboardFocusedNavi(0), isFocusedNaviModal(false)
 {
-	awe_webcore_initialize_default();
+	// Enable plugins by default
+	awe_webcore_initialize(true, true, false, awe_string_empty(), 
+		awe_string_empty(), awe_string_empty(), awe_string_empty(),
+		awe_string_empty(), AWE_LL_NORMAL, false,
+		awe_string_empty(), true, awe_string_empty(),
+		awe_string_empty(), awe_string_empty(), awe_string_empty(),
+		awe_string_empty(), awe_string_empty(), false, 0, false,
+		false, awe_string_empty());
+
 	awe_webcore_set_base_directory(OSM_STR(NaviUtilities::getCurrentWorkingDirectory() + baseDirectory + "\\"));
 	keyboardHook = new Impl::KeyboardHook(this);
 
